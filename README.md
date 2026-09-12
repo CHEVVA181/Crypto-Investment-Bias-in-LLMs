@@ -138,6 +138,43 @@ Grok's token-scenario count only reaches 719 once `responses-missing_grok.db` is
 in (515 in the main run + a deduplicated top-up); every other cell is 719 in
 `responses.db` alone.
 
+### Attribute-combination design
+
+Each prompt states a `budget` (CHF), `risk` tolerance, investment `term` and market
+`environment`, taken from these value sets:
+
+| Attribute   | Values                                                                  | Count |
+| ----------- | ------------------------------------------------------------------------ | ----: |
+| budget      | 100; 1,000; 10,000; 20,000; 30,000; 40,000; 50,000; 100,000 CHF           |     8 |
+| risk        | risk-averse, risk-neutral, risk-seeking                                  |     3 |
+| term        | less than one year, one to three years, three to ten years               |     3 |
+| environment | crisis, recession, recovery, expansion                                   |     4 |
+
+No single prompt varies all four independently at once — each one instead sweeps every
+value of one subset of attributes while holding the rest at a baseline. The `variables`
+column in the database records which subset that is, and the 15 non-empty subsets of the
+4 attributes give the full 719-prompt panel (same breakdown for both `tokens` and
+`exchanges`):
+
+| Attributes varied                    | Values combined | Prompts |
+| ------------------------------------- | ---------------- | ------: |
+| budget                                 | 8                 |       8 |
+| risk                                   | 3                 |       3 |
+| term                                   | 3                 |       3 |
+| environment                            | 4                 |       4 |
+| budget × risk                          | 8 × 3             |      24 |
+| budget × term                          | 8 × 3             |      24 |
+| budget × environment                   | 8 × 4             |      32 |
+| risk × term                            | 3 × 3             |       9 |
+| risk × environment                     | 3 × 4             |      12 |
+| term × environment                     | 3 × 4             |      12 |
+| budget × risk × term                   | 8 × 3 × 3         |      72 |
+| budget × risk × environment            | 8 × 3 × 4         |      96 |
+| budget × term × environment            | 8 × 3 × 4         |      96 |
+| risk × term × environment              | 3 × 3 × 4         |      36 |
+| budget × risk × term × environment     | 8 × 3 × 3 × 4     |     288 |
+| **Total**                               |                   | **719** |
+
 Expected schema:
 
 ```sql
