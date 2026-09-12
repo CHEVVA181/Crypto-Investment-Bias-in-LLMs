@@ -6,9 +6,7 @@ __pycache__/
 venv/
 .ipynb_checkpoints/
 
-# Response databases and generated analysis output
-data/
-*.db
+# Generated analysis output (databases in data/ are tracked)
 crypto_bias_output/
 affiliation_output/
 tests/test_output/

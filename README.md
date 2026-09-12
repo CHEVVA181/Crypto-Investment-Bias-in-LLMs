@@ -119,9 +119,24 @@ every model on the prompts every model answered and reports whether the ranking 
 
 ## Data
 
-The response databases (`responses.db` and any `responses-missing*.db` top-ups) and the
-generated `crypto_bias_output/` tree are not in version control. Point `CRYPTO_BIAS_DB` at
-your copy, or drop it at `data/responses.db`.
+The response databases live in `data/`: `responses.db` (main collection run) plus
+`data/responses-missing_grok.db`, a top-up that backfills token-scenario prompts Grok
+missed on the first run. `analy_db.py` merges them automatically (see
+[Running the pipeline](#running-the-pipeline)); the generated `crypto_bias_output/` tree
+is not tracked.
+
+Every model was asked the same 719 prompts per scenario:
+
+| Model            | Tokens prompts | Exchanges prompts |
+| ---------------- | -------------: | -----------------: |
+| GPT-5.5           |            719 |                719 |
+| Claude Haiku 4.5  |            719 |                719 |
+| Gemini 3.6 Flash  |            719 |                719 |
+| Grok 4.6          |            719 |                719 |
+
+Grok's token-scenario count only reaches 719 once `responses-missing_grok.db` is merged
+in (515 in the main run + a deduplicated top-up); every other cell is 719 in
+`responses.db` alone.
 
 Expected schema:
 
